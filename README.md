@@ -28,9 +28,14 @@ and some time later...
             [      60min            ] #notice always only 1 element
 ```
 
-
-
-
+###Aggregration
+min/low: minimal value
+max/high: 
+avg: 
+count:
+open:
+close:
+ohlc: Open, High, Low, Close
 
 ###Element time selector
 ######Rolling: a element that shift with the current time. eg. last 30 mins.   	
