@@ -33,11 +33,11 @@ and some time later...
 
 
 ###Element time selector
-Rolling: a element that shift with the current time. eg. last 30 mins.   	
-	LAST(TIME_PERIOD): eg. last 30mins
-Fixed: the time range is fixed. Time of date, Day of week, custom start end.      
-	ALL: (Default) include all
-	DAY_OF_WEEK: where ELEMENT are only every friday
-	DAYS_OF_WEEK: WEEKDAY(MON-FRI), WEEKEND(SAT,SUN)
-	HOURS_OF_DAY: 9AM-5PM
+######Rolling: a element that shift with the current time. eg. last 30 mins.   	
+	LAST(TIME_PERIOD): eg. last 30mins  
+######Fixed: the time range is fixed. Time of date, Day of week, custom start end.        
+	ALL: (Default) include all  
+	DAY_OF_WEEK: where ELEMENT are only every friday  
+	DAYS_OF_WEEK: WEEKDAY(MON-FRI), WEEKEND(SAT,SUN)  
+	HOURS_OF_DAY: 9AM-5PM  
 
