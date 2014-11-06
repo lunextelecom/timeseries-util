@@ -12,7 +12,7 @@ element contain time(begin), value and weight
 ###Type of data structure
 Timeseries: Array of element  
 RollingTimeseries: Same as Timeseries except the older record get expired and removed.  This is good for long running process to avoid over use of memory.  
-Bucket: contain a timeseries with granular grain size and a element that is sum of those element.  
+Bucket: contain a timeseries with granular size and a large element that is sum of those smaller ones.  
 ```
 at time 0
 [bucket0]...[bucket359]  #Granular time series.  Times series1 @ 10 sec (this can be graph)
