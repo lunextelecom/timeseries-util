@@ -1,5 +1,6 @@
 package com.lunex.timeseries.element;
 
+import com.lunex.timeseries.TimeDataset;
 import com.lunex.timeseries.TimeEvent;
 
 public class Double extends AbstractDataElement implements DataElement {
@@ -26,6 +27,16 @@ public class Double extends AbstractDataElement implements DataElement {
   public void update(TimeEvent event) {
     value += event.getValue();
     weight++;
+  }
+
+  @Override
+  public void add(DataElement item, TimeDataset.AggregateType type) {
+
+  }
+
+  @Override
+  public void remove(DataElement item, TimeDataset.AggregateType type) {
+
   }
 
   public String toString() {

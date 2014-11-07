@@ -9,21 +9,18 @@ import com.lunex.timeseries.element.Int;
 public class DataFactory {
 
 
-  public static TimeSeries<Int> createIntSeries(long time, String seriesName, int bucketSize) {
-    return createIntSeries(time, seriesName, bucketSize, TimeDataset.AggregateType.avg);
-  }
 
 
-  public static TimeSeries<Int> createIntSeries(long time, String seriesName, int bucketSize,
-                                                TimeDataset.AggregateType type) {
+  public static TimeSeries<Int> createIntSeries(long time, String seriesName, int elementSize,
+                                                TimeDataset.AggregateType type, int seriesSize) {
 
-    TimeSeries<Int> t = new TimeSeries<Int>(seriesName, bucketSize, type) {
+    TimeSeries<Int> t = new TimeSeries<Int>(seriesName, elementSize, type, seriesSize) {
       protected Int makeElement() {
         return new Int();
       }
     };
     if (time > 0) {
-      t.initTime(time);
+      t.init(time);
     }
     return t;
   }

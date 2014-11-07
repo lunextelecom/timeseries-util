@@ -4,9 +4,8 @@ import com.lunex.timeseries.element.DataElement;
 
 public interface TimeDataset<T extends DataElement> extends TimeEventListener{
 
-
   public enum AggregateType {
-    min, max, avg, count, ohlc
+    min, max, avg, count
   }
 
 
@@ -20,11 +19,15 @@ public interface TimeDataset<T extends DataElement> extends TimeEventListener{
    * Used during creation to initialize
    * @param time
    */
-  void initTime(long time);
+  void init(long time);
 
-  int getBucketSize();
+  int getElementSize();
+
+  int size();
 
   T getData(long time);
+
+  T first();
 
   T current();
 

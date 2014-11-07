@@ -1,11 +1,8 @@
 package com.lunex.timeseries;
 
-import com.google.common.reflect.TypeToken;
 
 import com.lunex.timeseries.element.DataElement;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,87 +12,75 @@ import java.util.List;
 
 
 /**
- * In-memory version of timeseries, whatever added will just be in the Array and will not get expired out.
- * Do not use this if you plan to keep adding records for long period of time.
- * Use TimeSeriesRolling instead
- * @param <T>
+ * In-memory version of timeseries, whatever added will just be in the Array and will not get
+ * expired out if seriesSize is not set. To expired old bucket, set seriesSize to have fix memory usage.
  */
-public class TimeSeries<T extends DataElement> implements TimeDataset<T>, Iterable<T> {
-  private final Logger log = LoggerFactory.getLogger(TimeSeries.class);
-  transient static DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+public class TimeSeries<T extends DataElement> extends TimeSeriesBase<T> implements TimeDataset<T>, Iterable<T> {
 
-  TypeToken<T> typeToken = new TypeToken<T>(getClass()) {};
-  Class<T> klass = (Class<T>)typeToken.getRawType();
-  String key;
-  int bucketSize;
-  AggregateType type;
-  //todo internal storage better implementation
+  private final Logger log = LoggerFactory.getLogger(TimeSeries.class);
+
+//  TypeToken<T> typeToken = new TypeToken<T>(getClass()) {
+//  };
+//  Class<T> klass = (Class<T>) typeToken.getRawType();
   List<T> list = new ArrayList();
   T current = null;
   T last = null;
 
-  public TimeSeries(String key, int bucketSize) {
-    this(key, bucketSize, AggregateType.avg);
+  //series information
+//  String key;
+//  int elementSize; //num
+//  AggregateType type;
+  int seriesSize = -1; //set this to a fix number to prevent over memory usage. default t0 100000
+
+  public TimeSeries(String key, int elementSize) {
+    this(key, elementSize, AggregateType.avg, 100000);
   }
 
-  public TimeSeries(String key, int bucketSize, AggregateType type) {
+  public TimeSeries(String key, int elementSize, AggregateType type, int seriesSize) {
     log.debug("TimeSeries {} created", key);
     this.key = key;
-    this.bucketSize = bucketSize;
+    this.elementSize = elementSize;
     this.type = type;
+    this.seriesSize = seriesSize;
   }
 
   public boolean onEvent(long time, TimeEvent event) {
-    long ttime = truncate(event.getTime());
-    if ((time - current.getTime() >= bucketSize)) {
+    log.debug(event.toString());
+    if ((time - current.getTime() >= elementSize)) {
+      log.debug("new element");
       last = current;
       current = makeElement();
+      long ttime = truncate(event.getTime());
       current.init(ttime);
       list.add(current);
+
+      if (seriesSize > 0) {
+        while (list.size() > seriesSize) {
+          list.remove(0);
+        }
+      }
+      current.update(event);
       return true;
-    }
-
-    current.update(event);
-    return false;
-  }
-
-  public long truncate(long time){
-    return (time / bucketSize ) * bucketSize;
-  }
-
-  /**
-   * Generic factory method to create new element to makeElement this class, overwrite for better performance
-   * @return
-   */
-  protected T makeElement() {
-    try {
-      T item = klass.newInstance();
-      return item;
-    } catch (InstantiationException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
+    } else {
+      current.update(event);
+      return false;
     }
   }
+
 
   /**
    * Unique name to identify this series
    */
   @Override
-  public void initTime(long time) {
+  public void init(long time) {
     current = makeElement();
     current.init(truncate(time));
     list.add(current);
   }
 
   @Override
-  public String getKey() {
-    return key;
-  }
-
-  @Override
-  public int getBucketSize() {
-    return bucketSize;
+  public int size() {
+    return list.size();
   }
 
   @Override
@@ -111,6 +96,11 @@ public class TimeSeries<T extends DataElement> implements TimeDataset<T>, Iterab
   }
 
   @Override
+  public T first() {
+    return list.get(0);
+  }
+
+  @Override
   public T current() {
     return current;
   }
@@ -120,10 +110,6 @@ public class TimeSeries<T extends DataElement> implements TimeDataset<T>, Iterab
     return last;
   }
 
-  @Override
-  public AggregateType getAggregateType() {
-    return type;
-  }
 
   @Override
   public Iterator<T> iterator() {

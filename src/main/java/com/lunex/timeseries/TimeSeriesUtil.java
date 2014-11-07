@@ -22,7 +22,7 @@ public class TimeSeriesUtil<T extends DataElement> {
 //  }
 
   /**
-   * Add and remove item from orig. add, remove must be of same size.  size of add, remove must be
+   * Add and remove bucket from orig. add, remove must be of same size.  size of add, remove must be
    * divisor by orig.size
    */
   public static <T extends DataElement> void shift(T orig, T add, T remove,
@@ -30,15 +30,17 @@ public class TimeSeriesUtil<T extends DataElement> {
 
   }
 
-  public static <T extends DataElement> void addEvent(TimeDataset<T> data, TimeEvent event) {
-
+  public static <T extends DataElement> void add(T bucket, T add, TimeDataset.AggregateType type) {
   }
+
+
+
 
   public static void print(OutputStream os, TimeDataset data) {
 
 
     PrintWriter p = new PrintWriter(os);
-    p.write(data.getKey() +"@" + data.getBucketSize());
+    p.write(data.getKey() +"@" + data.getElementSize());
     if (data instanceof Iterable) {
       p.write("series\n");
       for (Object t : ((TimeSeries) data)) {

@@ -24,7 +24,7 @@ public class TimeSeriesTest {
   @Test
   public void testCreateSeries() {
     DateTime dt = new DateTime(2014, 1, 1, 0, 0, 0);
-    TimeSeries<Int> s1 = DataFactory.createIntSeries(dt.getMillis(), "myseries", 5000);
+    TimeSeries<Int> s1 = DataFactory.createIntSeries(dt.getMillis(), "myseries", 5000, TimeDataset.AggregateType.avg, -1);
     for (int i = 0; i < 20; i++) {
       TimeEvent evt = new TimeEvent("", dt.getMillis() + i * 1000, i);
       s1.onEvent(evt.getTime(), evt);
@@ -34,26 +34,48 @@ public class TimeSeriesTest {
 
   @Test
   public void testDataEngine() {
-    log.info("testDataEngine");
     DataEngine engine = new DataEngine(new SimpleDataProcessor());
 
     //create series
     DateTime dt = new DateTime(2014, 1, 1, 0, 0, 0);
-    TimeSeries<Int> s1 = DataFactory.createIntSeries(dt.getMillis(), "myseries@5", 5 * 1000);
-//    TimeSeries<Int> s2 = DataFactory.createIntSeries(dt.getMillis(), "myseries@30", 30 * 1000);
+    TimeSeries<Int> s1 = DataFactory.createIntSeries(dt.getMillis(), "myseries@5", 5 * 1000,
+                                                     TimeDataset.AggregateType.avg, -1);
     engine.bindSeriesToEvent("neworder", s1);
-//    engine.bindSeriesToEvent("neworder", s2);
 
     //create output
     engine.addDatasetListener(s1, new ConsoleSubscriber());
-//    engine.addDatasetListener(s2, new ConsoleSubscriber());
 
     for (int i = 0; i < 20; i++) {
       TimeEvent evt = new TimeEvent("neworder", dt.getMillis() + i * 1000, i);
       engine.onEvent(evt.getTime(), evt);
     }
-
+    assert s1.first().value() == 10;
+    assert s1.last().value() == 60;
+    assert s1.current.value() == 85;
     TimeSeriesUtil.print(System.out, s1);
+  }
+
+  @Test
+  public void testRollingTimeSeries()
+  {
+    DataEngine engine = new DataEngine(new SimpleDataProcessor());
+
+    //create series
+    DateTime dt = new DateTime(2014, 1, 1, 0, 0, 0);
+    TimeSeries<Int> s1 = DataFactory.createIntSeries(dt.getMillis(), "myseries", 5 * 1000, TimeDataset.AggregateType.avg, 5);
+    engine.bindSeriesToEvent("neworder", s1);
+
+    //create output
+    engine.addDatasetListener(s1, new ConsoleSubscriber());
+
+
+    for (int i = 0; i < 100; i++) {
+      TimeEvent evt = new TimeEvent("neworder", dt.getMillis() + i * 1000, i);
+      engine.onEvent(evt.getTime(), evt);
+    }
+    assert s1.size() == 5;
+    TimeSeriesUtil.print(System.out, s1);
+
   }
 
   class ConsoleSubscriber implements TimeDatasetListener {

@@ -58,7 +58,7 @@ public class TimeSeriesBenchmark {
 
 
   void populateSeries(TimeSeries<Int> series) {
-    series.initTime(dt.getMillis());
+    series.init(dt.getMillis());
     for(TimeEvent evt : events) {
       series.onEvent(evt.getTime(), evt);
     }

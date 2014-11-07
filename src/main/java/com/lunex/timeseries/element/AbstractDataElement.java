@@ -7,6 +7,7 @@ public abstract class AbstractDataElement implements DataElement {
 
   transient static DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
+
   long time;
   int weight;
 
@@ -19,6 +20,11 @@ public abstract class AbstractDataElement implements DataElement {
   @Override
   public long getTime() {
     return time;
+  }
+
+  @Override
+  public void setTime(long time) {
+    this.time = time;
   }
 
   @Override
