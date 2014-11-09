@@ -4,10 +4,15 @@ import com.google.common.reflect.TypeToken;
 
 import com.lunex.timeseries.element.DataElement;
 
+
+/**
+ * Provide basic function for subclass
+ * @param <T>
+ */
 public class TimeSeriesBase<T extends DataElement> {
 
-  TypeToken<T> typeToken = new TypeToken<T>(getClass()) {
-  };
+  //automatic determine the class if setClass is not set
+  TypeToken<T> typeToken = new TypeToken<T>(getClass()) {};
   Class<T> klass = (Class<T>) typeToken.getRawType();
   //series information
   String key;
@@ -44,6 +49,10 @@ public class TimeSeriesBase<T extends DataElement> {
 
   public long truncate(long time) {
     return (time / elementSize) * elementSize;
+  }
+
+  public void setClass(Class klass){
+    this.klass = klass;
   }
 
 }

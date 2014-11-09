@@ -31,7 +31,7 @@ public class Int extends AbstractDataElement implements DataElement {
 
 
   @Override
-  public void remove(DataElement remove, TimeDataset.AggregateType type) {
+  public void subtract(DataElement remove, TimeDataset.AggregateType type) {
     Int _item = (Int)remove;
     switch (type){
       case min:
@@ -68,6 +68,7 @@ public class Int extends AbstractDataElement implements DataElement {
         break;
       case avg:
       default:
+//        if (this.weight + _item.weight == 0) break;
         this.value = (this.value * this.weight + _item.value * _item.weight)/(this.weight + _item.weight);
 
     }

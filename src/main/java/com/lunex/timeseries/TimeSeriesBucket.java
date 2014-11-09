@@ -1,16 +1,19 @@
 package com.lunex.timeseries;
 
+
 import com.lunex.timeseries.element.DataElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
+
 
 /**
  * rolling version of
  *
- * [      60min            ] #bucket [element1]
- * [element2]...[element361][current] #series
+ *           [      60min            ] #bucket
+ * [element1][element2]...[element361][current] #series
  *
  * Notice element1 is kept so we can access the first item is the removed item.
  */
@@ -18,17 +21,19 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
     implements TimeDataset<T> {
 
   private final Logger log = LoggerFactory.getLogger(TimeSeriesBucket.class);
-  String key;
-  int bucketSize;
-  T bucket;
-  AggregateType type;
+
+  private int bucketSize;
+  private T bucket;
+
   TimeSeries<T> series;
-  int seriesSize;
+  private int seriesSize;
 
 
   public TimeSeriesBucket(String key, int bucketSize, int elementSize, AggregateType type) {
+    log.debug("TimeSeriesBucket {} created", key);
     this.key = key;
     this.bucketSize = bucketSize;
+    this.elementSize = elementSize;
     this.type = type;
     if (bucketSize % elementSize != 0) {
       throw new RuntimeException("Bucket size must be divible of elementsize");
@@ -36,7 +41,12 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
     //added one so the first element is the
     this.seriesSize = bucketSize / elementSize;
     this.series =
-        new TimeSeries<T>(key + "." + "fine", elementSize, type, seriesSize + 1);
+        new TimeSeries<T>(key + "." + "fine", elementSize, type, seriesSize + 2){
+          @Override
+          protected T makeElement() {
+            return TimeSeriesBucket.this.makeElement();
+          }
+        };
   }
 
   /**
@@ -45,7 +55,7 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
   @Override
   public void init(long time) {
     bucket = makeElement();
-    bucket.init(time);
+    bucket.setTime(time);
     series.init(time);
   }
 
@@ -83,17 +93,59 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
   public boolean onEvent(long time, TimeEvent event) {
     if (series.onEvent(time, event)) {
       //new element is added and element might be removed.
+      long startTime = Math.max(truncate(event.getTime())-bucketSize, bucket.getTime());
+      boolean shift = false;
+      Iterator<T> iter = series.iterator();
+      while(iter.hasNext()){
+        T element = iter.next();
+        if (element.getTime() < startTime){
+          bucket.subtract(element, getAggregateType());
+          iter.remove();
+          shift = true;
+        }
+        else{
+          break;
+        }
+      }
+      bucket.setTime(startTime);
+      bucket.add(series.last(), getAggregateType());
+      //set to the new time to the 2nd item
+
+      if (shift)
+        log.debug("{}.shift {}", key, bucket);
+      else
+        log.debug("{}.add   {}", key, bucket);
+    }
+
+
+    return false;
+  }
+
+
+  public boolean onEventFixsize(long time, TimeEvent event) {
+    if (series.onEvent(time, event)) {
+      //new element is added and element might be removed.
       if (series.size() >= seriesSize + 2) {
         //need to get first element
         //get last element
-        bucket.remove(series.first(), getAggregateType());
+        bucket.subtract(series.first(), getAggregateType());
         bucket.add(series.last(), getAggregateType());
         //set to the new time to the 2nd item
-        bucket.setTime(series.list.get(1).getTime());
+        bucket.setTime(truncate(event.getTime())-bucketSize+elementSize);
+        log.debug("{}.shift {}", key, bucket);
       } else {
-        bucket.add(last(), getAggregateType());
+
+        bucket.add(series.last(), getAggregateType());
+        log.debug("{}.add   {}", key, bucket);
       }
+
     }
     return false;
   }
+
+  public int getSeriesSize() {
+    return seriesSize;
+  }
+
+
 }

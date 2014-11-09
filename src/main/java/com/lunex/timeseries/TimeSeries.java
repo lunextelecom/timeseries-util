@@ -1,6 +1,5 @@
 package com.lunex.timeseries;
 
-
 import com.lunex.timeseries.element.DataElement;
 
 import org.slf4j.Logger;
@@ -19,18 +18,11 @@ public class TimeSeries<T extends DataElement> extends TimeSeriesBase<T> impleme
 
   private final Logger log = LoggerFactory.getLogger(TimeSeries.class);
 
-//  TypeToken<T> typeToken = new TypeToken<T>(getClass()) {
-//  };
-//  Class<T> klass = (Class<T>) typeToken.getRawType();
-  List<T> list = new ArrayList();
-  T current = null;
-  T last = null;
+  private List<T> list = new ArrayList();
+  private T current = null;
+  private T last = null;
 
-  //series information
-//  String key;
-//  int elementSize; //num
-//  AggregateType type;
-  int seriesSize = -1; //set this to a fix number to prevent over memory usage. default t0 100000
+  private int seriesSize = -1; //set this to a fix number to prevent over memory usage. default t0 100000
 
   public TimeSeries(String key, int elementSize) {
     this(key, elementSize, AggregateType.avg, 100000);
@@ -45,17 +37,16 @@ public class TimeSeries<T extends DataElement> extends TimeSeriesBase<T> impleme
   }
 
   public boolean onEvent(long time, TimeEvent event) {
-    log.debug(event.toString());
+
     if ((time - current.getTime() >= elementSize)) {
-      log.debug("new element");
+
       last = current;
       current = makeElement();
-      long ttime = truncate(event.getTime());
-      current.init(ttime);
+      current.setTime(truncate(event.getTime()));
       list.add(current);
 
-      if (seriesSize > 0) {
-        while (list.size() > seriesSize) {
+      if (seriesSize != -1) {
+        while (first().getTime() < ) {
           list.remove(0);
         }
       }
@@ -68,13 +59,10 @@ public class TimeSeries<T extends DataElement> extends TimeSeriesBase<T> impleme
   }
 
 
-  /**
-   * Unique name to identify this series
-   */
   @Override
   public void init(long time) {
     current = makeElement();
-    current.init(truncate(time));
+    current.setTime(truncate(time));
     list.add(current);
   }
 
@@ -109,7 +97,6 @@ public class TimeSeries<T extends DataElement> extends TimeSeriesBase<T> impleme
   public T last() {
     return last;
   }
-
 
   @Override
   public Iterator<T> iterator() {

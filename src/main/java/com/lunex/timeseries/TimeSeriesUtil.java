@@ -22,7 +22,7 @@ public class TimeSeriesUtil<T extends DataElement> {
 //  }
 
   /**
-   * Add and remove bucket from orig. add, remove must be of same size.  size of add, remove must be
+   * Add and subtract bucket from orig. add, subtract must be of same size.  size of add, subtract must be
    * divisor by orig.size
    */
   public static <T extends DataElement> void shift(T orig, T add, T remove,
@@ -47,10 +47,11 @@ public class TimeSeriesUtil<T extends DataElement> {
         p.write(t.toString() + "\n");
 
       }
-    } else {
-      p.write("bucket\n");
-      p.write(data.toString());
     }
-    p.close();
+    else {
+      p.write("bucket\n");
+      p.write(data.current().toString());
+    }
+    p.flush();
   }
 }

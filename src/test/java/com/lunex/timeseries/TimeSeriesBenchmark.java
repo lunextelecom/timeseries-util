@@ -15,7 +15,7 @@ import java.util.List;
 
 
 /**
- * Benchmark test.  Should remove loop in the test
+ * Benchmark test.  Should subtract loop in the test
  *
  */
 @State(Scope.Thread)
