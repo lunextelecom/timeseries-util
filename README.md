@@ -29,13 +29,13 @@ and some time later...
 ```
 
 ###Aggregration
-min/low: minimal value
-max/high: 
-avg: 
-count:
-open:
-close:
-ohlc: Open, High, Low, Close
+min/low: minimal value  
+max/high:  
+avg:  
+count:  
+open:  
+close:  
+ohlc: Open, High, Low, Close  
 
 ###Element time selector
 ######Rolling: a element that shift with the current time. eg. last 30 mins.   	
