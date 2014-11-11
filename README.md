@@ -2,7 +2,13 @@ timeseries-util
 ===============
 Timeseries implementation, basic operations, and usage pattern.
 
-###Structure
+###Common Usage Pattern
+- func(avg, total)(x element) over series with x Seconds/Mins/Hours interval per element
+- Avg,Sum of Last x Mins/Hours/Days 
+- Avg,Sum of Last x Friday
+- Series with only 9am-9pm, Mon-Fri
+
+###Series Structure
 ```
 [element0]...[element359] # Series is an array of element
 
@@ -10,8 +16,7 @@ element contain time(begin), value and weight
 ```
 
 ###Type of data structure
-Timeseries: Array of element  
-RollingTimeseries: Same as Timeseries except the older record get expired and removed.  This is good for long running process to avoid over use of memory.  
+Timeseries: Array of element. Older record get expired and removed.  This is good for long running process to avoid over use of memory.  
 Bucket: contain a timeseries with granular size and a large element that is sum of those smaller ones.  
 ```
 at time 0
@@ -27,6 +32,12 @@ and some time later...
 [element2]...[element361][element362]...[element721]
             [      60min            ] #notice always only 1 element
 ```
+
+###Function
+Function create a new series from a source series.
+1. Simple Moving Avg
+2. Sum
+3. Max
 
 ###Aggregration
 min/low: minimal value  
