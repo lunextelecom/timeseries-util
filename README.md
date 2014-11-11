@@ -5,7 +5,7 @@ Timeseries implementation, basic operations, and usage pattern.
 ###Common Usage Pattern
 - func(avg, sum)(x element) over series with x Seconds/Mins/Hours interval per element.
 ```
-use function over 
+use function over series
 ```
 - Avg,Sum of Last x Mins/Hours/Days 
 ```
