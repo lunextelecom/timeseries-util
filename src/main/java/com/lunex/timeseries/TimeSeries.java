@@ -21,6 +21,7 @@ public class TimeSeries<T extends DataElement> extends TimeSeriesBase<T> impleme
   private List<T> list = new ArrayList();
   private T current = null;
   private T last = null;
+  private TimeSelector timeSelector = null;
 
   private int seriesSize = -1; //set this to a fix number to prevent over memory usage. default t0 100000
 
@@ -34,11 +35,13 @@ public class TimeSeries<T extends DataElement> extends TimeSeriesBase<T> impleme
     this.elementSize = elementSize;
     this.type = type;
     this.seriesSize = seriesSize;
+    this.timeSelector = TimeSelectorFactory.getSelector(TimeSelector.Type.ALL, elementSize);
   }
 
   public boolean onEvent(long time, TimeEvent event) {
 
-    if ((time - current.getTime() >= elementSize)) {
+    if (timeSelector.isNext(current.getTime(), event.getTime())) {
+//    if ((event.getTime() - current.getTime() >= elementSize)) {
 
       last = current;
       current = makeElement();
@@ -46,7 +49,10 @@ public class TimeSeries<T extends DataElement> extends TimeSeriesBase<T> impleme
       list.add(current);
 
       if (seriesSize != -1) {
-        while (first().getTime() < ) {
+//        long cutofftime = current().getTime() - elementSize * seriesSize;
+        long cutofftime = timeSelector.prev(current.getTime(), seriesSize);
+        log.debug("{} < {}", TimeSeriesUtil.timetoStr(first().getTime()), TimeSeriesUtil.timetoStr(cutofftime));
+        while (first().getTime() < cutofftime  ) {
           list.remove(0);
         }
       }

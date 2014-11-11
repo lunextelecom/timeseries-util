@@ -81,8 +81,9 @@ public class TimeSeriesTest extends BaseTest {
     engine.addDatasetListener(s1, new ConsoleSubscriber());
 
     feedData(engine, dt, 100);
-    assert s1.size() == 5;
     TimeSeriesUtil.print(System.out, s1);
+    assert s1.size() == 6;
+
 
   }
 

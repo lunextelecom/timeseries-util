@@ -34,7 +34,13 @@ public class TimeSeriesUtil<T extends DataElement> {
   }
 
 
+  public static String timetoStr(long time){
+    return fmt.print(time);
+  }
 
+  public static long truncate(long time, long duration) {
+    return (time / duration) * duration;
+  }
 
   public static void print(OutputStream os, TimeDataset data) {
 
