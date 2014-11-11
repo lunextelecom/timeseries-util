@@ -3,10 +3,47 @@ timeseries-util
 Timeseries implementation, basic operations, and usage pattern.
 
 ###Common Usage Pattern
-- func(avg, total)(x element) over series with x Seconds/Mins/Hours interval per element
+- func(avg, sum)(x element) over series with x Seconds/Mins/Hours interval per element.
+```
+use function over 
+```
 - Avg,Sum of Last x Mins/Hours/Days 
+```
+Use TimeSeriesBucket of bucksize of x Mins/Hours/Days with elementSize of 5 sec(data definition)
+alternatively, can use Function avg, sum over a regular series.
+```
 - Avg,Sum of Last x Friday
-- Series with only 9am-9pm, Mon-Fri
+```
+Create series Time Schedule to include only friday with element size day.
+Create Function Avg or Sum for interval of x days.
+```
+- Series with only 9am-5pm, Mon-Fri
+```
+Create series with with custom Schedule, 
+9am-5pm
+Mon-Fri
+```
+
+###Aggregration
+min/low: minimal value  
+max/high:  
+avg:  
+count:  
+
+### Element Behavior: a element that shift with the current time. eg. last 30 mins.
+	EVERY(TIME_PERIOD): every 30 mins  
+	LAST(TIME_PERIOD, DEFINITION): TIME_PERIOD is how far to look back, DEFINITION is how detail the data is.  eg. last 30mins 
+### Time Schedule
+	ALL: (Default) include all  
+	DAY_OF_WEEK: where ELEMENT are only every friday  
+	DAYS_OF_WEEK: WEEKDAY(MON-FRI), WEEKEND(SAT,SUN)  
+	HOURS_OF_DAY: 9AM-5PM  
+
+###Function
+Function create a new series from a source series.
+1. Simple Moving Avg
+2. Sum
+3. Max
 
 ###Series Structure
 ```
@@ -33,27 +70,5 @@ and some time later...
             [      60min            ] #notice always only 1 element
 ```
 
-###Function
-Function create a new series from a source series.
-1. Simple Moving Avg
-2. Sum
-3. Max
 
-###Aggregration
-min/low: minimal value  
-max/high:  
-avg:  
-count:  
-open:  
-close:  
-ohlc: Open, High, Low, Close  
-
-###Element time selector
-######Rolling: a element that shift with the current time. eg. last 30 mins.   	
-	LAST(TIME_PERIOD): eg. last 30mins  
-######Fixed: the time range is fixed. Time of date, Day of week, custom start end.        
-	ALL: (Default) include all  
-	DAY_OF_WEEK: where ELEMENT are only every friday  
-	DAYS_OF_WEEK: WEEKDAY(MON-FRI), WEEKEND(SAT,SUN)  
-	HOURS_OF_DAY: 9AM-5PM  
 
