@@ -96,7 +96,7 @@ public class TimeSeriesTest extends BaseTest {
     TimeSeries<Int>
         s1 =
         DataFactory
-            .createSeries(Int.class, dt.getMillis(), "myseries", 60*60 * 1000, TimeDataset.AggregateType.avg, sch,
+            .createSeries(Int.class, dt.getMillis(), "myseries", TimeDataset.AggregateType.avg, sch,
                              50);
     engine.bindSeriesToEvent("neworder", s1);
 
@@ -107,5 +107,52 @@ public class TimeSeriesTest extends BaseTest {
     TimeSeriesUtil.print(System.out, s1);
 //    assert s1.size() == 11;
   }
+
+  @Test
+  public void testPhantomAllDay(){
+    DateTime dt = new DateTime(2014, 1, 1, 0, 0, 0);
+    DataEngine engine = new DataEngine(new SimpleDataProcessor());
+    TimeSchedule sch = new TimeSchedule.DayOfWeek(new int[] {dt.getDayOfWeek()}, 10* 60 * 1000);
+    TimeSeries<Int>
+        s1 =
+        DataFactory
+            .createSeries(Int.class, dt.getMillis(), "myseries", TimeDataset.AggregateType.avg, sch,
+                          50);
+    engine.bindSeriesToEvent("neworder", s1);
+
+    TimeEvent evt = new TimeEvent("neworder", dt.plusMinutes(5).getMillis(), 5);
+    engine.onEvent(evt.getTime(), evt);
+    evt = new TimeEvent("neworder", dt.plusMinutes(30).getMillis(), 5);
+    engine.onEvent(evt.getTime(), evt);
+    evt = new TimeEvent("neworder", dt.plusMinutes(32).getMillis(), 5);
+    engine.onEvent(evt.getTime(), evt);
+    TimeSeriesUtil.print(System.out, s1);
+    assert s1.size() == 4;
+
+  }
+
+  @Test
+  public void testPhantomDayOfWeek(){
+    DateTime dt = new DateTime(2014, 1, 1, 0, 0, 0);
+    DataEngine engine = new DataEngine(new SimpleDataProcessor());
+    TimeSchedule sch = new TimeSchedule.DayOfWeek(new int[] {dt.getDayOfWeek()}, 60* 60 * 1000);
+    TimeSeries<Int>
+        s1 =
+        DataFactory
+            .createSeries(Int.class, dt.getMillis(), "myseries", TimeDataset.AggregateType.avg, sch,
+                          50);
+    engine.bindSeriesToEvent("neworder", s1);
+
+    TimeEvent evt = new TimeEvent("neworder", dt.plusMinutes(5).getMillis(), 5);
+    engine.onEvent(evt.getTime(), evt);
+    evt = new TimeEvent("neworder", dt.plusMinutes(129).getMillis(), 5);
+    engine.onEvent(evt.getTime(), evt);
+    evt = new TimeEvent("neworder", dt.plusDays(7).plusMinutes(105).getMillis(), 5);
+    engine.onEvent(evt.getTime(), evt);
+    TimeSeriesUtil.print(System.out, s1);
+
+
+  }
+
 
 }

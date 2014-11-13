@@ -13,7 +13,7 @@ public class DataFactory {
 
   public static TimeSeriesBucket<Double> createBucket(long time, String seriesName, int bucketSize, int elementSize, TimeDataset.AggregateType type){
 
-    TimeSeriesBucket<Double> t = new TimeSeriesBucket<Double>(seriesName, bucketSize, elementSize, type, null){
+    TimeSeriesBucket<Double> t = new TimeSeriesBucket<Double>(seriesName, bucketSize, elementSize, type, new TimeSchedule.AllDayAllWeek(elementSize)){
       protected Double makeElement() {
         return new Double();
       }
@@ -62,10 +62,10 @@ public class DataFactory {
     return t;
   }
 
-  public static <T extends DataElement> TimeSeries<T> createSeries(Class klass, long time, String seriesName, int elementSize,
+  public static <T extends DataElement> TimeSeries<T> createSeries(Class klass, long time, String seriesName,
                                                                    TimeDataset.AggregateType type, TimeSchedule schedule, int seriesSize) {
 
-    TimeSeries<T> t = new TimeSeries<T>(seriesName, elementSize, type, schedule, seriesSize);
+    TimeSeries<T> t = new TimeSeries<T>(seriesName, type, schedule, seriesSize);
     t.setClass(klass);
     if (time > 0) {
       t.init(time);

@@ -14,12 +14,16 @@ public abstract class TimeSchedule {
 
   protected final Logger log = LoggerFactory.getLogger(TimeSchedule.class);
   protected long time;
+  protected int elementSize;
+
 
   public long next() {
     return next(time);
   }
 
   public abstract long next(long time);
+
+  public abstract boolean isValid(long time);
 
   public long prev() {
     return prev(1);
@@ -39,19 +43,27 @@ public abstract class TimeSchedule {
     this.time = curTime;
   }
 
+  public int getElementSize() {
+    return elementSize;
+  }
+
   /**
    * Default time selector, include all day all week
    */
   public static class AllDayAllWeek extends TimeSchedule {
 
-    long elementSize;
 
-    public AllDayAllWeek(long elementSize) {
+    public AllDayAllWeek(int elementSize) {
       this.elementSize = elementSize;
     }
 
     public long next(long time) {
       return time + elementSize;
+    }
+
+    @Override
+    public boolean isValid(long time) {
+      return true;
     }
 
     public long prev(long time, int i) {
@@ -68,14 +80,13 @@ public abstract class TimeSchedule {
     static long week = 7 * day; //days*hours*minutes*second*millis
 
     Set daysOfWeek;
-    long elementSize;
     DateTimeZone tz;
 
-    public DayOfWeek(int[] dayOfWeek, long elementSize) {
+    public DayOfWeek(int[] dayOfWeek, int elementSize) {
       this(dayOfWeek, elementSize, DateTimeZone.getDefault());
     }
 
-    public DayOfWeek(int[] dayOfWeek, long elementSize, DateTimeZone tz) {
+    public DayOfWeek(int[] dayOfWeek, int elementSize, DateTimeZone tz) {
       this.daysOfWeek = Sets.newHashSet(Ints.asList(dayOfWeek));
       this.elementSize = elementSize;
       this.tz = tz;
@@ -93,6 +104,11 @@ public abstract class TimeSchedule {
         long today = TimeSeriesUtil.truncate(time, day, tz);
         return today + week;
       }
+    }
+
+    @Override
+    public boolean isValid(long time) {
+      return daysOfWeek.contains(new DateTime(time).getDayOfWeek());
     }
 
     @Override
@@ -154,6 +170,11 @@ public abstract class TimeSchedule {
     @Override
     public long next(long time) {
       return 0;
+    }
+
+    @Override
+    public boolean isValid(long time) {
+      return false;
     }
 
     @Override

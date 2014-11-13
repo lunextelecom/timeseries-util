@@ -41,7 +41,7 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
     //added one so the first element is the
     this.seriesSize = bucketSize / elementSize;
     this.series =
-        new TimeSeries<T>(key + "." + "fine", elementSize, type, schedule, seriesSize + 2){
+        new TimeSeries<T>(key + "." + "fine", type, schedule, seriesSize + 2){
           @Override
           protected T makeElement() {
             return TimeSeriesBucket.this.makeElement();

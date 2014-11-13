@@ -2,22 +2,20 @@ package com.lunex.timeseries;
 
 import com.lunex.timeseries.element.DataElement;
 
-public interface TimeDataset<T extends DataElement> extends TimeEventListener{
+public interface TimeDataset<T extends DataElement> extends TimeEventListener {
+
 
   public enum AggregateType {
     min, max, avg, count
   }
 
-
   /**
    * Unique name to identify this series
-   * @return
    */
   String getKey();
 
   /**
    * Used during creation to initialize
-   * @param time
    */
   void init(long time);
 
@@ -33,6 +31,9 @@ public interface TimeDataset<T extends DataElement> extends TimeEventListener{
 
   T last();
 
+
   AggregateType getAggregateType();
+
+
 
 }
