@@ -4,6 +4,8 @@ import com.google.common.reflect.TypeToken;
 
 import com.lunex.timeseries.element.DataElement;
 
+import org.joda.time.DateTimeZone;
+
 
 /**
  * Provide basic function for subclass
@@ -48,7 +50,7 @@ public class TimeSeriesBase<T extends DataElement> {
   }
 
   public long truncate(long time) {
-    return (time / elementSize) * elementSize;
+    return TimeSeriesUtil.truncate(time, elementSize, TimeSeriesUtil.getDefaultTimeZone());
   }
 
   public void setClass(Class klass){

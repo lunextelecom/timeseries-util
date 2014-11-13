@@ -12,7 +12,8 @@ public class DataFactory {
 
 
   public static TimeSeriesBucket<Double> createBucket(long time, String seriesName, int bucketSize, int elementSize, TimeDataset.AggregateType type){
-    TimeSeriesBucket<Double> t = new TimeSeriesBucket<Double>(seriesName, bucketSize, elementSize, type){
+
+    TimeSeriesBucket<Double> t = new TimeSeriesBucket<Double>(seriesName, bucketSize, elementSize, type, null){
       protected Double makeElement() {
         return new Double();
       }
@@ -40,9 +41,31 @@ public class DataFactory {
   }
 
   public static <T extends DataElement> TimeSeries<T> createSeries(Class klass, long time, String seriesName, int elementSize,
+                                                                   TimeDataset.AggregateType type) {
+
+    TimeSeries<T> t = new TimeSeries<T>(seriesName, elementSize, type, -1);
+    t.setClass(klass);
+    if (time > 0) {
+      t.init(time);
+    }
+    return t;
+  }
+
+  public static <T extends DataElement> TimeSeries<T> createSeries(Class klass, long time, String seriesName, int elementSize,
                                                 TimeDataset.AggregateType type, int seriesSize) {
 
     TimeSeries<T> t = new TimeSeries<T>(seriesName, elementSize, type, seriesSize);
+    t.setClass(klass);
+    if (time > 0) {
+      t.init(time);
+    }
+    return t;
+  }
+
+  public static <T extends DataElement> TimeSeries<T> createSeries(Class klass, long time, String seriesName, int elementSize,
+                                                                   TimeDataset.AggregateType type, TimeSchedule schedule, int seriesSize) {
+
+    TimeSeries<T> t = new TimeSeries<T>(seriesName, elementSize, type, schedule, seriesSize);
     t.setClass(klass);
     if (time > 0) {
       t.init(time);

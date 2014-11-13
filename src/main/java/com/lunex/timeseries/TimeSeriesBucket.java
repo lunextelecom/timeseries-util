@@ -1,6 +1,5 @@
 package com.lunex.timeseries;
 
-
 import com.lunex.timeseries.element.DataElement;
 
 import org.slf4j.Logger;
@@ -11,6 +10,7 @@ import java.util.Iterator;
 
 /**
  * rolling version of
+ * Use this if to implement something like last 5 hours with 10 sec update
  *
  *           [      60min            ] #bucket
  * [element1][element2]...[element361][current] #series
@@ -29,7 +29,7 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
   private int seriesSize;
 
 
-  public TimeSeriesBucket(String key, int bucketSize, int elementSize, AggregateType type) {
+  public TimeSeriesBucket(String key, int bucketSize, int elementSize, AggregateType type, TimeSchedule schedule) {
     log.debug("TimeSeriesBucket {} created", key);
     this.key = key;
     this.bucketSize = bucketSize;
@@ -41,7 +41,7 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
     //added one so the first element is the
     this.seriesSize = bucketSize / elementSize;
     this.series =
-        new TimeSeries<T>(key + "." + "fine", elementSize, type, seriesSize + 2){
+        new TimeSeries<T>(key + "." + "fine", elementSize, type, schedule, seriesSize + 2){
           @Override
           protected T makeElement() {
             return TimeSeriesBucket.this.makeElement();
@@ -93,7 +93,7 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
   public boolean onEvent(long time, TimeEvent event) {
     if (series.onEvent(time, event)) {
       //new element is added and element might be removed.
-      long startTime = Math.max(truncate(event.getTime())-bucketSize, bucket.getTime());
+      long startTime = Math.max(truncate(time)-bucketSize, bucket.getTime());
       boolean shift = false;
       Iterator<T> iter = series.iterator();
       while(iter.hasNext()){

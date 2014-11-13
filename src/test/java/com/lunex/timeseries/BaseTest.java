@@ -18,9 +18,13 @@ public class BaseTest {
   }
 
   public void feedData(TimeEventListener engine, DateTime startTime, int num){
+    feedData(engine, startTime, num, 1000);
+  }
+
+  public void feedData(TimeEventListener engine, DateTime startTime, int num, int incre){
     log.info("begin feeding data...");
     for (int i = 0; i < num; i++) {
-      TimeEvent evt = new TimeEvent("neworder", startTime.getMillis() + i * 1000, i);
+      TimeEvent evt = new TimeEvent("neworder", startTime.getMillis() + i * incre, i);
       engine.onEvent(evt.getTime(), evt);
     }
     log.info("finish feeding data");

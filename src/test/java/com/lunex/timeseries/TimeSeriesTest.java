@@ -22,10 +22,11 @@ public class TimeSeriesTest extends BaseTest {
         DataFactory
             .createIntSeries(dt.getMillis(), "myseries", 5000, TimeDataset.AggregateType.avg, -1);
     feedData(s1, dt, 20);
+    TimeSeriesUtil.print(System.out, s1);
     assert s1.first().value() == 10;
     assert s1.last().value() == 60;
     assert s1.current().value() == 85;
-    TimeSeriesUtil.print(System.out, s1);
+
   }
 
   @Test
@@ -83,8 +84,28 @@ public class TimeSeriesTest extends BaseTest {
     feedData(engine, dt, 100);
     TimeSeriesUtil.print(System.out, s1);
     assert s1.size() == 6;
+  }
 
+  @Test
+  public void testTimesSeriesDayOfWeek(){
+    DataEngine engine = new DataEngine(new SimpleDataProcessor());
 
+    //create series
+    DateTime dt = new DateTime(2014, 1, 1, 0, 0, 0);
+    TimeSchedule sch = new TimeSchedule.DayOfWeek(new int[] {dt.getDayOfWeek()}, 60* 60 * 1000);
+    TimeSeries<Int>
+        s1 =
+        DataFactory
+            .createSeries(Int.class, dt.getMillis(), "myseries", 60*60 * 1000, TimeDataset.AggregateType.avg, sch,
+                             50);
+    engine.bindSeriesToEvent("neworder", s1);
+
+    //create output
+    engine.addDatasetListener(s1, new ConsoleSubscriber());
+
+    feedData(engine, dt, 24*15*6, 10*60*1000);
+    TimeSeriesUtil.print(System.out, s1);
+//    assert s1.size() == 11;
   }
 
 }
