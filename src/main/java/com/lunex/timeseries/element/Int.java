@@ -3,7 +3,7 @@ package com.lunex.timeseries.element;
 import com.lunex.timeseries.TimeDataset;
 import com.lunex.timeseries.TimeEvent;
 
-public class Int extends AbstractDataElement implements DataElement {
+public class Int extends BaseDataElement implements DataElement {
 
   int value;
 
@@ -20,6 +20,11 @@ public class Int extends AbstractDataElement implements DataElement {
   }
 
   public int value() {
+    return value;
+  }
+
+  @Override
+  public double castDouble() {
     return value;
   }
 

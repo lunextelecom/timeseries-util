@@ -1,6 +1,7 @@
 package com.lunex.timeseries;
 
 
+import com.lunex.timeseries.TimeDataset.AggregateType;
 import com.lunex.timeseries.element.DataElement;
 import com.lunex.timeseries.element.Int;
 import com.lunex.timeseries.element.Double;
@@ -11,10 +12,21 @@ import com.lunex.timeseries.element.Double;
 public class DataFactory {
 
 
-  public static TimeSeriesBucket<Double> createBucket(long time, String seriesName, int bucketSize, int elementSize, TimeDataset.AggregateType type){
+  public static <T extends DataElement> TimeSeriesBucket<T> createBucket(Class klass, long time, String seriesName, int bucketSize, int elementSize, AggregateType type){
+
+    TimeSeriesBucket<T> t = new TimeSeriesBucket<T>(seriesName, bucketSize, elementSize, type, new TimeSchedule.AllDayAllWeek(elementSize));
+    t.setClass(klass);
+    if (time > 0) {
+      t.init(time);
+    }
+    return t;
+  }
+
+
+  public static TimeSeriesBucket<Double> createBucket(long time, String seriesName, int bucketSize, int elementSize, AggregateType type){
 
     TimeSeriesBucket<Double> t = new TimeSeriesBucket<Double>(seriesName, bucketSize, elementSize, type, new TimeSchedule.AllDayAllWeek(elementSize)){
-      protected Double makeElement() {
+      public Double makeElement() {
         return new Double();
       }
     };
@@ -24,35 +36,13 @@ public class DataFactory {
     return t;
   }
 
-  public static TimeSeries<Int> createIntSeries(long time, String seriesName, int elementSize,
-                                                TimeDataset.AggregateType type, int seriesSize) {
+  public static <T extends DataElement> TimeSeries<T> createSeries(Class klass, long time, String seriesName, int elementSize) {
 
-//    TimeSeries<Int> t = new TimeSeries<Int>(seriesName, elementSize, type, seriesSize) {
-//      protected Int makeElement() {
-//        return new Int();
-//      }
-//    };
-    TimeSeries<Int> t = new TimeSeries<Int>(seriesName, elementSize, type, seriesSize){};
-
-    if (time > 0) {
-      t.init(time);
-    }
-    return t;
+    return createSeries(klass, time, seriesName, elementSize, AggregateType.avg, -1);
   }
 
   public static <T extends DataElement> TimeSeries<T> createSeries(Class klass, long time, String seriesName, int elementSize,
-                                                                   TimeDataset.AggregateType type) {
-
-    TimeSeries<T> t = new TimeSeries<T>(seriesName, elementSize, type, -1);
-    t.setClass(klass);
-    if (time > 0) {
-      t.init(time);
-    }
-    return t;
-  }
-
-  public static <T extends DataElement> TimeSeries<T> createSeries(Class klass, long time, String seriesName, int elementSize,
-                                                TimeDataset.AggregateType type, int seriesSize) {
+                                                AggregateType type, int seriesSize) {
 
     TimeSeries<T> t = new TimeSeries<T>(seriesName, elementSize, type, seriesSize);
     t.setClass(klass);
@@ -63,7 +53,7 @@ public class DataFactory {
   }
 
   public static <T extends DataElement> TimeSeries<T> createSeries(Class klass, long time, String seriesName,
-                                                                   TimeDataset.AggregateType type, TimeSchedule schedule, int seriesSize) {
+                                                                   AggregateType type, TimeSchedule schedule, int seriesSize) {
 
     TimeSeries<T> t = new TimeSeries<T>(seriesName, type, schedule, seriesSize);
     t.setClass(klass);
@@ -73,5 +63,18 @@ public class DataFactory {
     return t;
   }
 
+  public static <T extends DataElement> TimeSeriesMap<T> createSeriesMap(Class klass, String seriesName, int elementSize,
+                                                                         AggregateType type, int seriesSize) {
+    return createSeriesMap(klass, seriesName, type, new TimeSchedule.AllDayAllWeek(elementSize), seriesSize);
+  }
+
+
+  public static <T extends DataElement> TimeSeriesMap<T> createSeriesMap(Class klass, String seriesName,
+                                                                   AggregateType type, TimeSchedule schedule, int seriesSize) {
+
+    TimeSeriesMap<T> map = new TimeSeriesMap<T>(seriesName, type, schedule, seriesSize);
+    map.setClass(klass);
+    return map;
+  }
 
 }

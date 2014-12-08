@@ -20,7 +20,7 @@ public class TimeSeriesTest extends BaseTest {
     TimeSeries<Int>
         s1 =
         DataFactory
-            .createIntSeries(dt.getMillis(), "myseries", 5000, TimeDataset.AggregateType.avg, -1);
+            .createSeries(Int.class, dt.getMillis(), "myseries", 5000);
     feedData(s1, dt, 20);
     TimeSeriesUtil.print(System.out, s1);
     assert s1.first().value() == 10;
@@ -34,8 +34,7 @@ public class TimeSeriesTest extends BaseTest {
     DateTime dt = new DateTime(2014, 1, 1, 0, 0, 0);
     TimeSeries<Int>
         s2 =
-        DataFactory.createSeries(Int.class, dt.getMillis(), "myseries", 5000,
-                                 TimeDataset.AggregateType.avg, -1);
+        DataFactory.createSeries(Int.class, dt.getMillis(), "myseries", 5000);
 
 
     feedData(s2, dt, 20);
@@ -52,8 +51,7 @@ public class TimeSeriesTest extends BaseTest {
 
     //create series
     DateTime dt = new DateTime(2014, 1, 1, 0, 0, 0);
-    TimeSeries<Int> s1 = DataFactory.createIntSeries(dt.getMillis(), "myseries@5", 5 * 1000,
-                                                     TimeDataset.AggregateType.avg, -1);
+    TimeSeries<Int> s1 = DataFactory.createSeries(Int.class, dt.getMillis(), "myseries@5", 5 * 1000);
     engine.bindSeriesToEvent("neworder", s1);
 
     //create output
@@ -74,7 +72,7 @@ public class TimeSeriesTest extends BaseTest {
     TimeSeries<Int>
         s1 =
         DataFactory
-            .createIntSeries(dt.getMillis(), "myseries", 5 * 1000, TimeDataset.AggregateType.avg,
+            .createSeries(Int.class, dt.getMillis(), "myseries", 5 * 1000, TimeDataset.AggregateType.avg,
                              5);
     engine.bindSeriesToEvent("neworder", s1);
 
@@ -150,9 +148,14 @@ public class TimeSeriesTest extends BaseTest {
     evt = new TimeEvent("neworder", dt.plusDays(7).plusMinutes(105).getMillis(), 5);
     engine.onEvent(evt.getTime(), evt);
     TimeSeriesUtil.print(System.out, s1);
-
-
+    assert s1.first().getTime() == dt.getMillis();
+    assert s1.getElement(dt.getMillis()).value() == 5;
+    assert s1.getElement(dt.plusHours(2).getMillis()).value() == 5;
+    assert s1.getElement(dt.plusDays(7).plusHours(1).getMillis()).value() == 5;
   }
+
+
+
 
 
 }

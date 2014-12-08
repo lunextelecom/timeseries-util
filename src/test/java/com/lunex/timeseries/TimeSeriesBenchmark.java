@@ -47,7 +47,7 @@ public class TimeSeriesBenchmark {
                                                                         int bucketSize) {
     TimeSeries<Int> t = new TimeSeries<Int>(key, bucketSize) {
       @Override
-      protected Int makeElement() {
+      public Int makeElement() {
         return new Int();
       }
     };
@@ -116,7 +116,7 @@ public class TimeSeriesBenchmark {
     }
 
     @Override
-    protected Int makeElement() {
+    public Int makeElement() {
       return new Int();
     }
   }

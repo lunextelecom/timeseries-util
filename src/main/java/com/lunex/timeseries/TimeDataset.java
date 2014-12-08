@@ -2,7 +2,7 @@ package com.lunex.timeseries;
 
 import com.lunex.timeseries.element.DataElement;
 
-public interface TimeDataset<T extends DataElement> extends TimeEventListener {
+public interface TimeDataset<T extends DataElement> extends TimeEventObserver {
 
 
   public enum AggregateType {
@@ -23,7 +23,7 @@ public interface TimeDataset<T extends DataElement> extends TimeEventListener {
 
   int size();
 
-  T getData(long time);
+  T getElement(long time);
 
   T first();
 

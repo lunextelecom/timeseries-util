@@ -8,18 +8,17 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class TimeSchedule {
 
   protected final Logger log = LoggerFactory.getLogger(TimeSchedule.class);
-  protected long time;
+
   protected int elementSize;
 
 
-  public long next() {
-    return next(time);
-  }
 
   public abstract long next(long time);
 
@@ -33,19 +32,14 @@ public abstract class TimeSchedule {
     return prev(time, 1);
   }
 
-  public long prev(int i) {
-    return prev(time, i);
-  }
 
   public abstract long prev(long time, int i);
-
-  public void setCurTime(long curTime) {
-    this.time = curTime;
-  }
 
   public int getElementSize() {
     return elementSize;
   }
+
+  public abstract int len(long start, long end);
 
   /**
    * Default time selector, include all day all week
@@ -69,6 +63,11 @@ public abstract class TimeSchedule {
     public long prev(long time, int i) {
       return time - elementSize * i;
     }
+
+    @Override
+    public int len(long start, long end) {
+      return (int)((end - start)/elementSize);
+    }
   }
 
   /**
@@ -80,6 +79,7 @@ public abstract class TimeSchedule {
     static long week = 7 * day; //days*hours*minutes*second*millis
 
     Set daysOfWeek;
+    Map<Integer, Integer> dayGap;
     DateTimeZone tz;
 
     public DayOfWeek(int[] dayOfWeek, int elementSize) {
@@ -88,8 +88,24 @@ public abstract class TimeSchedule {
 
     public DayOfWeek(int[] dayOfWeek, int elementSize, DateTimeZone tz) {
       this.daysOfWeek = Sets.newHashSet(Ints.asList(dayOfWeek));
+      log.info("daysOfWeek {}", daysOfWeek);
       this.elementSize = elementSize;
       this.tz = tz;
+      dayGap = new HashMap();
+      for (int day = 1; day <= 7; day++) {
+        int count = 1;
+        for (int gap = 1; gap <= 7; gap++) {
+          int nextValidDay = (day + gap)%7;
+          if (!daysOfWeek.contains(nextValidDay)){
+            count++;
+          }
+          else{
+            break;
+          }
+        }
+        dayGap.put(day, count);
+      }
+      log.info("dayGap {}", dayGap);
     }
 
     @Override
@@ -102,7 +118,8 @@ public abstract class TimeSchedule {
       }
       else{
         long today = TimeSeriesUtil.truncate(time, day, tz);
-        return today + week;
+        return today + (dayGap.get(new DateTime(today).getDayOfWeek()))*day;
+
       }
     }
 
@@ -121,7 +138,7 @@ public abstract class TimeSchedule {
       }
       else {
         long today = TimeSeriesUtil.truncate(time, day, tz);
-        return today - week + day - elementSize;
+        return today - dayGap.get(new DateTime(today).getDayOfWeek())*day + day - elementSize;
       }
     }
 
@@ -132,57 +149,27 @@ public abstract class TimeSchedule {
       }
       return time;
     }
-  }
-
-
-  //todo finish implement PartOfDay
-  public static class PartOfDay extends TimeSchedule {
-
-    long startTime;
-    long numElement;
-    long elementSize;
-
-    DateTime curTime;
 
     /**
-     * @param startTime  - start time in millis with 0 = 00:00:00
-     * @param numElement - the duration in millis to include since startTime
+     * compute the element between start and end.
+     * @param start
+     * @param end
+     * @return
      */
-    public PartOfDay(long startTime, long numElement, long elementSize) {
-      this.startTime = TimeSeriesUtil.truncate(startTime, elementSize);
-      this.numElement = numElement;
-      this.elementSize = elementSize;
-    }
-
     @Override
-    public void setCurTime(long time) {
-      super.setCurTime(time);
-      curTime = new DateTime(time);
-    }
+    public int len(long start, long end) {
+      int ret = 0;
+      long time = start;
+      while(time < end){
+        time = this.next(time);
+        ret++;
+      }
 
-    @Override
-    public long next() {
-      DateTime newTime = curTime.plus(elementSize);
-      int x = newTime.millisOfDay().get();
-      return 0;
+      return ret;
     }
-
-    @Override
-    public long next(long time) {
-      return 0;
-    }
-
-    @Override
-    public boolean isValid(long time) {
-      return false;
-    }
-
-    @Override
-    public long prev(long time, int i) {
-      return 0;
-    }
-
   }
+
+
 
 
 }

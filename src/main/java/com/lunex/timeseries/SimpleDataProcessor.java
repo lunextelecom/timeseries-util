@@ -14,7 +14,7 @@ public class SimpleDataProcessor extends DataProcessor {
 
 
   @Override
-  public void registerEvent(String evtName, TimeEventListener listener) {
+  public void registerEvent(String evtName, TimeEventObserver listener) {
     //can use this function to do optimization
   }
 
@@ -29,7 +29,7 @@ public class SimpleDataProcessor extends DataProcessor {
    * @param event - the time Event object
    */
   @Override
-  public boolean onEvent(long time, TimeEvent event) {
+  public int onEvent(long time, TimeEvent event) {
     /**
      * 1. find and pass all TimeEventListener for this event
      * 2. update TimeEventLister(bucket, series)
@@ -39,21 +39,22 @@ public class SimpleDataProcessor extends DataProcessor {
 
     ArrayList<Tuple> dispatchBuffer = new ArrayList<Tuple>();
 
-    Map<TimeDataset, List<TimeDatasetListener>> hier = map.getEventListeners(event.getKey());
-    for (Map.Entry<TimeDataset,List<TimeDatasetListener>> entry : hier.entrySet()) {
-      TimeDataset series = entry.getKey();
-      boolean isNewItem = series.onEvent(time, event);
-      if (isNewItem) {
-        dispatchBuffer.add(new Tuple(series.getKey(), series, series.last(), entry.getValue()));
+    List<TimeEventObserver> hier = map.getEventListeners(event.getName());
+
+    for (TimeEventObserver series : hier) {
+      int numItemAdd = series.onEvent(time, event);
+      if (numItemAdd>0) {
+        if (series instanceof TimeDataset)
+          dispatchBuffer.add(new Tuple(series.getKey(), (TimeDataset) series, ((TimeDataset)series).last(), ((TimeSeriesBase)series).getObservers(), numItemAdd));
       }
     }
 
     for (Tuple item : dispatchBuffer) {
-      for (TimeDatasetListener subscriber : item.subscribers) {
-        subscriber.onData(item.data, item.item);
+      for (TimeDatasetObserver subscriber : item.subscribers) {
+        subscriber.onData(item.data, item.item, item.num);
       }
     }
-    return false;
+    return 0;
   }
 
 
@@ -64,14 +65,16 @@ public class SimpleDataProcessor extends DataProcessor {
     TimeDataset data;
     String name;
     DataElement item;
-    List<TimeDatasetListener> subscribers;
+    List<TimeDatasetObserver> subscribers;
+    int num;
 
 
-    Tuple(String name, TimeDataset data, DataElement item, List<TimeDatasetListener> subscribers) {
+    Tuple(String name, TimeDataset data, DataElement item, List<TimeDatasetObserver> subscribers, int num) {
       this.name = name;
       this.data = data;
       this.item = item;
       this.subscribers = subscribers;
+      this.num = num;
     }
   }
 }

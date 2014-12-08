@@ -8,26 +8,33 @@ import org.slf4j.LoggerFactory;
 
 public class BaseTest {
   private final Logger log = LoggerFactory.getLogger(TimeSeriesTest.class);
-  class ConsoleSubscriber implements TimeDatasetListener {
+  class ConsoleSubscriber implements TimeDatasetObserver {
 
     @Override
-    public void onData(TimeDataset data, DataElement item) {
+    public void onData(TimeDataset data, DataElement item, int num) {
       log.info(item.toString());
     }
 
   }
 
-  public void feedData(TimeEventListener engine, DateTime startTime, int num){
+  public void feedData(TimeEventObserver engine, DateTime startTime, int num){
     feedData(engine, startTime, num, 1000);
   }
 
-  public void feedData(TimeEventListener engine, DateTime startTime, int num, int incre){
+  public void feedData(TimeEventObserver engine, DateTime startTime, int num, int incre){
+    feedData(engine, startTime, num, incre, new String[] {"sellerA"});
+  }
+
+  public void feedData(TimeEventObserver engine, DateTime startTime, int num, int incre, String[] keys){
     log.info("begin feeding data...");
     for (int i = 0; i < num; i++) {
-      TimeEvent evt = new TimeEvent("neworder", startTime.getMillis() + i * incre, i);
-      engine.onEvent(evt.getTime(), evt);
+      for (String key: keys){
+        TimeEvent evt = new TimeEvent("neworder", key, startTime.getMillis() + i * incre, i);
+        engine.onEvent(evt.getTime(), evt);
+      }
     }
     log.info("finish feeding data");
   }
+
 
 }

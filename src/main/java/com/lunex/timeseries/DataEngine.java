@@ -4,7 +4,7 @@ package com.lunex.timeseries;
  * Provide contact point for user to update events and map.
  *
  */
-public class DataEngine implements TimeEventListener {
+public class DataEngine implements TimeEventObserver {
 
   private DataProcessor processor;
 
@@ -16,9 +16,9 @@ public class DataEngine implements TimeEventListener {
     processor.setDataMap(map);
   }
 
-  public DataMap getMap() {
-    return map;
-  }
+//  public DataMap getMap() {
+//    return map;
+//  }
 
   @Override
   public String getKey() {
@@ -26,13 +26,14 @@ public class DataEngine implements TimeEventListener {
   }
 
   @Override
-  public boolean onEvent(long time, TimeEvent event) {
+  public int onEvent(long time, TimeEvent event) {
     processor.onEvent(time, event);
-    return false;
+    return 0;
   }
 
-  public void addDatasetListener(TimeDataset dataset, TimeDatasetListener listener){
-    map.addDatasetListener(dataset, listener);
+  public void addDatasetListener(TimeDatasetObservable dataset, TimeDatasetObserver listener){
+//    map.addDatasetListener(dataset, listener);
+    dataset.register(listener);
   }
 
   /**
@@ -40,7 +41,7 @@ public class DataEngine implements TimeEventListener {
    * @param evtName
    * @param dataset
    */
-  public void bindSeriesToEvent(String evtName, TimeDataset dataset){
+  public void bindSeriesToEvent(String evtName, TimeEventObserver dataset){
     map.addTimeEventListener(evtName, dataset);
     processor.registerEvent(evtName, dataset);
   }

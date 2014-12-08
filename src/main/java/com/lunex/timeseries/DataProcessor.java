@@ -1,6 +1,6 @@
 package com.lunex.timeseries;
 
-public abstract class DataProcessor implements TimeEventListener{
+public abstract class DataProcessor implements TimeEventObserver {
 
   private DataMap dataMap;
 
@@ -12,5 +12,5 @@ public abstract class DataProcessor implements TimeEventListener{
     this.dataMap = map;
   }
 
-  public abstract void registerEvent(String eventName, TimeEventListener listener);
+  public abstract void registerEvent(String eventName, TimeEventObserver listener);
 }

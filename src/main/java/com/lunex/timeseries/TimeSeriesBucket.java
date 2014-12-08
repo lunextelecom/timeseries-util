@@ -43,7 +43,7 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
     this.series =
         new TimeSeries<T>(key + "." + "fine", type, schedule, seriesSize + 2){
           @Override
-          protected T makeElement() {
+          public T makeElement() {
             return TimeSeriesBucket.this.makeElement();
           }
         };
@@ -65,7 +65,7 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
   }
 
   @Override
-  public T getData(long time) {
+  public T getElement(long time) {
     return bucket;
   }
 
@@ -90,8 +90,8 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
    * @param event - the time Event object
    */
   @Override
-  public boolean onEvent(long time, TimeEvent event) {
-    if (series.onEvent(time, event)) {
+  public int onEvent(long time, TimeEvent event) {
+    if (series.onEvent(time, event) > 0) {
       //new element is added and element might be removed.
       long startTime = Math.max(truncate(time)-bucketSize, bucket.getTime());
       boolean shift = false;
@@ -116,31 +116,7 @@ public class TimeSeriesBucket<T extends DataElement> extends TimeSeriesBase<T>
       else
         log.debug("{}.add   {}", key, bucket);
     }
-
-
-    return false;
-  }
-
-
-  public boolean onEventFixsize(long time, TimeEvent event) {
-    if (series.onEvent(time, event)) {
-      //new element is added and element might be removed.
-      if (series.size() >= seriesSize + 2) {
-        //need to get first element
-        //get last element
-        bucket.subtract(series.first(), getAggregateType());
-        bucket.add(series.last(), getAggregateType());
-        //set to the new time to the 2nd item
-        bucket.setTime(truncate(event.getTime())-bucketSize+elementSize);
-        log.debug("{}.shift {}", key, bucket);
-      } else {
-
-        bucket.add(series.last(), getAggregateType());
-        log.debug("{}.add   {}", key, bucket);
-      }
-
-    }
-    return false;
+    return 0;
   }
 
   public int getSeriesSize() {

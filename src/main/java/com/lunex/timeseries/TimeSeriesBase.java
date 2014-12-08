@@ -3,15 +3,19 @@ package com.lunex.timeseries;
 import com.google.common.reflect.TypeToken;
 
 import com.lunex.timeseries.element.DataElement;
+import com.lunex.timeseries.element.ElementFactory;
 
 import org.joda.time.DateTimeZone;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * Provide basic function for subclass
  * @param <T>
  */
-public class TimeSeriesBase<T extends DataElement> {
+public class TimeSeriesBase<T extends DataElement> implements ElementFactory<T>, TimeDatasetObservable {
 
   //automatic determine the class if setClass is not set
   TypeToken<T> typeToken = new TypeToken<T>(getClass()) {};
@@ -20,13 +24,13 @@ public class TimeSeriesBase<T extends DataElement> {
   String key;
   int elementSize; //in millis
   TimeDataset.AggregateType type;
-
+  List<TimeDatasetObserver> subscribers = new ArrayList<TimeDatasetObserver>();
 
   /**
    * Generic factory method to create new element to makeElement this class, overwrite for better
    * performance
    */
-  protected T makeElement() {
+  public T makeElement() {
     try {
       T item = klass.newInstance();
       return item;
@@ -57,4 +61,14 @@ public class TimeSeriesBase<T extends DataElement> {
     this.klass = klass;
   }
 
+  @Override
+  public void register(TimeDatasetObserver observer) {
+    if (!subscribers.contains(observer))
+      subscribers.add(observer);
+  }
+
+  @Override
+  public List<TimeDatasetObserver> getObservers() {
+    return subscribers;
+  }
 }

@@ -3,11 +3,12 @@ package com.lunex.timeseries.element;
 import com.lunex.timeseries.TimeDataset;
 import com.lunex.timeseries.TimeEvent;
 
-public class Double extends AbstractDataElement implements DataElement {
+public class Double extends BaseDataElement implements DataElement {
 
   double value;
 
-  public Double(){};
+  public Double() {
+  }
 
   public Double(long time, double value) {
     this(time, value, 1);
@@ -24,6 +25,11 @@ public class Double extends AbstractDataElement implements DataElement {
   }
 
   @Override
+  public double castDouble() {
+    return value;
+  }
+
+  @Override
   public void update(TimeEvent event) {
     value += event.getValue();
     weight++;
@@ -31,8 +37,8 @@ public class Double extends AbstractDataElement implements DataElement {
 
   @Override
   public void subtract(DataElement remove, TimeDataset.AggregateType type) {
-    Double _item = (Double)remove;
-    switch (type){
+    Double _item = (Double) remove;
+    switch (type) {
       case min:
         this.value = Math.max(_item.value, this.value);
         break;
@@ -44,18 +50,18 @@ public class Double extends AbstractDataElement implements DataElement {
         break;
       case avg:
       default:
-        this.value = (this.value * this.weight - _item.value * _item.weight)/(this.weight - _item.weight);
+        this.value =
+            (this.value * this.weight - _item.value * _item.weight) / (this.weight - _item.weight);
 
     }
     this.weight -= _item.weight;
   }
 
 
-
   @Override
   public void add(DataElement item, TimeDataset.AggregateType type) {
-    Double _item = (Double)item;
-    switch (type){
+    Double _item = (Double) item;
+    switch (type) {
       case min:
         this.value = Math.min(_item.value, this.value);
         break;
@@ -68,7 +74,8 @@ public class Double extends AbstractDataElement implements DataElement {
       case avg:
       default:
 //        if (this.weight + _item.weight == 0) break;
-        this.value = (this.value * this.weight + _item.value * _item.weight)/(this.weight + _item.weight);
+        this.value =
+            (this.value * this.weight + _item.value * _item.weight) / (this.weight + _item.weight);
 
     }
     this.weight += _item.weight;

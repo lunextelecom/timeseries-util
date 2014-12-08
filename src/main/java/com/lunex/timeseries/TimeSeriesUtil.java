@@ -63,16 +63,23 @@ public class TimeSeriesUtil {
     p.write(data.getKey() + "@" + data.getElementSize());
     int count = 1;
     if (data instanceof Iterable) {
-      p.write("series\n");
+      p.write("\n");
 
       for (Object t : ((TimeSeries) data)) {
         p.write(t.toString() +":" +count++ + "\n");
 
       }
     } else {
-      p.write("bucket\n");
+      p.write("\n");
       p.write(data.current().toString());
     }
     p.flush();
   }
+
+  public static void print(OutputStream os, TimeSeriesMap data) {
+    for(Object series: data.seriesMap.values()){
+      print(os, (TimeDataset) series);
+    }
+  }
+
 }

@@ -21,8 +21,11 @@ public class TimeSeriesBucketTest extends BaseTest {
     int bucksetSize = 60*1000;
     int elementSize = 5*1000;
 
-    TimeSeriesBucket<Double> bucket = DataFactory.createBucket(dt.getMillis(), "salelast30", 60 * 1000, 5000,
-                                                     TimeDataset.AggregateType.avg);
+//    TimeSeriesBucket<Double> bucket = DataFactory.createBucket(dt.getMillis(), "salelast30", 60 * 1000, 5000,
+//                                                     TimeDataset.AggregateType.avg);
+    TimeSeriesBucket<Double> bucket = DataFactory.createBucket(Double.class, dt.getMillis(), "salelast30", 60 * 1000, 5000,
+                                                               TimeDataset.AggregateType.avg);
+
     engine.bindSeriesToEvent("neworder", bucket);
     feedData(engine, dt, 100);
     TimeSeriesUtil.print(System.out, bucket.series);
