@@ -3,6 +3,8 @@ timeseries-util
 
 [![Build Status](https://travis-ci.org/lunextelecom/timeseries-util.svg?branch=master)](https://travis-ci.org/lunextelecom/timeseries-util)
 [![Coverage Status](https://coveralls.io/repos/lunextelecom/timeseries-util/badge.png)](https://coveralls.io/r/lunextelecom/timeseries-util)
+[![Build Status](https://img.shields.io/travis/lunextelecom/timeseries-util/master.svg)](https://travis-ci.org/lunextelecom/timeseries-util)
+[![Coverage Status](https://img.shields.io/coveralls/lunextelecom/timeseries-util/master.svg)](https://coveralls.io/r/lunextelecom/timeseries-util)
 
 Timeseries implementation, basic operations, and usage pattern.
 
