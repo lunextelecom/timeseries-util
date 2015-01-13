@@ -1,5 +1,8 @@
 timeseries-util
 ===============
+
+[![Build Status](https://travis-ci.org/lunextelecom/timeseries-util.svg?branch=master)](https://travis-ci.org/lunextelecom/timeseries-util)
+
 Timeseries implementation, basic operations, and usage pattern.
 
 ###Common Usage Pattern
