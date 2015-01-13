@@ -31,7 +31,7 @@ public class TimeSeriesUtil {
     if (duration <= hour) {
       return (time / duration) * duration;
     } else {
-      throw new RuntimeException("Truncate cannot support mroe than 1 hour");
+      throw new RuntimeException("Truncate cannot support more than 1 hour");
     }
   }
 

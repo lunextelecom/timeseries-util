@@ -18,10 +18,10 @@ public class UtilTest {
     assert TimeSeriesUtil.truncate(dt.getMillis() + 9999, 10 * 1000) == dt.getMillis();
     assert TimeSeriesUtil.truncate(dt.getMillis() + 10000, 10 * 1000) == dt.getMillis() + 10 * 1000;
     assert TimeSeriesUtil.truncate(dt.getMillis() + 25000, 10 * 1000) == dt.getMillis() + 20 * 1000;
-    long prev = TimeSeriesUtil.truncate(dt.getMillis() - 60*1000, 24 * 60 * 60 * 1000, DateTimeZone.forID("EST"));
-    log.info("{} == {}", TimeSeriesUtil.timetoStr(prev), TimeSeriesUtil.timetoStr(dt.minusDays(1).getMillis()));
-    log.info("{} == {}", prev, dt.minusDays(1).getMillis());
-    assert prev == dt.minusDays(1).getMillis();
+    long prev = TimeSeriesUtil.truncate(dt.getMillis() - 60*1000, 60 * 60 * 1000);
+    log.info("{} == {}", TimeSeriesUtil.timetoStr(prev), TimeSeriesUtil.timetoStr(dt.minusHours(1).getMillis()));
+    log.info("{} == {}", prev, dt.minusHours(1).getMillis());
+    assert prev == dt.minusHours(1).getMillis();
   }
 
   @Test
