@@ -2,6 +2,7 @@ package com.lunex.timeseries;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.NoSuchElementException;
  * DataMap provide a map of how flow of data are connected. 1. mapping of event to TimeData 2.
  * mapping of subscriber to TimeData
  */
-public class DataMap {
+public class DataMap implements DatasetCreateObserver{
 
   //evtName,
   private Map<String, List<TimeEventObserver>>
@@ -27,6 +28,9 @@ public class DataMap {
     return ret;
   }
 
+  //Global list of all series by name
+  public Map<String, TimeDataset> seriesByName = new LinkedHashMap<String, TimeDataset>();
+
   /**
    * this makes the time data and the event bind together.  All events of that eventname will now
    * also update the data.  Multiple data can build to the same eventName
@@ -38,5 +42,9 @@ public class DataMap {
 
   }
 
+  @Override
+  public void onSeriesCreate(TimeSeries series) {
+    seriesByName.put(series.getKey(), series);
+  }
 }
 

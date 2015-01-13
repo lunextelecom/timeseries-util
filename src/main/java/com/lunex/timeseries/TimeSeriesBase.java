@@ -5,20 +5,19 @@ import com.google.common.reflect.TypeToken;
 import com.lunex.timeseries.element.DataElement;
 import com.lunex.timeseries.element.ElementFactory;
 
-import org.joda.time.DateTimeZone;
-
 import java.util.ArrayList;
 import java.util.List;
 
 
 /**
  * Provide basic function for subclass
- * @param <T>
  */
-public class TimeSeriesBase<T extends DataElement> implements ElementFactory<T>, TimeDatasetObservable {
+public class TimeSeriesBase<T extends DataElement>
+    implements ElementFactory<T>, TimeDatasetObservable {
 
   //automatic determine the class if setClass is not set
-  TypeToken<T> typeToken = new TypeToken<T>(getClass()) {};
+  TypeToken<T> typeToken = new TypeToken<T>(getClass()) {
+  };
   Class<T> klass = (Class<T>) typeToken.getRawType();
   //series information
   String key;
@@ -57,18 +56,21 @@ public class TimeSeriesBase<T extends DataElement> implements ElementFactory<T>,
     return TimeSeriesUtil.truncate(time, elementSize, TimeSeriesUtil.getDefaultTimeZone());
   }
 
-  public void setClass(Class klass){
+  public void setClass(Class klass) {
     this.klass = klass;
   }
 
   @Override
   public void register(TimeDatasetObserver observer) {
-    if (!subscribers.contains(observer))
+    if (!subscribers.contains(observer)) {
       subscribers.add(observer);
+    }
   }
 
   @Override
   public List<TimeDatasetObserver> getObservers() {
     return subscribers;
   }
+
+
 }

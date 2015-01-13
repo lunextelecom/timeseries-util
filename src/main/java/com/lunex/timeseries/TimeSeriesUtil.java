@@ -76,7 +76,7 @@ public class TimeSeriesUtil {
     p.flush();
   }
 
-  public static void print(OutputStream os, TimeSeriesMap data) {
+  public static void print(OutputStream os, TimeSeriesKeyMap data) {
     for(Object series: data.seriesMap.values()){
       print(os, (TimeDataset) series);
     }

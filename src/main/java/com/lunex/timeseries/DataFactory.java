@@ -3,7 +3,6 @@ package com.lunex.timeseries;
 
 import com.lunex.timeseries.TimeDataset.AggregateType;
 import com.lunex.timeseries.element.DataElement;
-import com.lunex.timeseries.element.Int;
 import com.lunex.timeseries.element.Double;
 
 /**
@@ -63,16 +62,16 @@ public class DataFactory {
     return t;
   }
 
-  public static <T extends DataElement> TimeSeriesMap<T> createSeriesMap(Class klass, String seriesName, int elementSize,
+  public static <T extends DataElement> TimeSeriesKeyMap<T> createSeriesMap(Class klass, String seriesName, int elementSize,
                                                                          AggregateType type, int seriesSize) {
     return createSeriesMap(klass, seriesName, type, new TimeSchedule.AllDayAllWeek(elementSize), seriesSize);
   }
 
 
-  public static <T extends DataElement> TimeSeriesMap<T> createSeriesMap(Class klass, String seriesName,
+  public static <T extends DataElement> TimeSeriesKeyMap<T> createSeriesMap(Class klass, String seriesName,
                                                                    AggregateType type, TimeSchedule schedule, int seriesSize) {
 
-    TimeSeriesMap<T> map = new TimeSeriesMap<T>(seriesName, type, schedule, seriesSize);
+    TimeSeriesKeyMap<T> map = new TimeSeriesKeyMap<T>(seriesName, type, schedule, seriesSize);
     map.setClass(klass);
     return map;
   }

@@ -1,5 +1,7 @@
 package com.lunex.timeseries;
 
+import com.lunex.timeseries.function.OneToOne;
+
 /**
  * Provide contact point for user to update events and map.
  *
@@ -16,10 +18,6 @@ public class DataEngine implements TimeEventObserver {
     processor.setDataMap(map);
   }
 
-//  public DataMap getMap() {
-//    return map;
-//  }
-
   @Override
   public String getKey() {
     return this.getClass().getSimpleName();
@@ -32,7 +30,6 @@ public class DataEngine implements TimeEventObserver {
   }
 
   public void addDatasetListener(TimeDatasetObservable dataset, TimeDatasetObserver listener){
-//    map.addDatasetListener(dataset, listener);
     dataset.register(listener);
   }
 
@@ -45,4 +42,25 @@ public class DataEngine implements TimeEventObserver {
     map.addTimeEventListener(evtName, dataset);
     processor.registerEvent(evtName, dataset);
   }
+
+  /**
+   * Apply a function to a timeseries.
+   * @param func
+   * @param dataset
+   * @param nameOut
+   */
+  public static void applyFunc(final OneToOne func, final TimeDatasetObservable dataset, String nameOut ){
+
+
+    if (dataset instanceof TimeSeriesKeyMap) {
+      //create FuncWrapper on new series create
+      //register newly created Timeseries so it can be obtain later on.
+
+    }
+  }
+
+  public TimeDataset getDataset(String name){
+    return null;
+  }
+
 }

@@ -41,12 +41,15 @@ public class TimeSeries<T extends DataElement> extends TimeSeriesBase<T>
   }
 
   public TimeSeries(String key, AggregateType type, TimeSchedule schedule, int seriesSize) {
-    log.debug("TimeSeries {} created", key);
     this.key = key;
     this.elementSize = schedule.elementSize;
     this.type = type;
     this.seriesSize = seriesSize;
     this.schedule = schedule;
+  }
+
+  public TimeSeries(String key, TimeSeries series){
+    this(key, series.type, series.schedule, series.seriesSize);
   }
 
   public void addElement(T element){
@@ -178,6 +181,17 @@ public class TimeSeries<T extends DataElement> extends TimeSeriesBase<T>
   public Cursor<T> getCursor() {
     int index = Ordering.natural().binarySearch(list, new BaseDataElement(first().getTime()));
     return new Cursor<T>(this, index, 1);
+  }
+
+  /**
+   * 1 = current
+   * 0 = last item
+   * -1 = before last
+   * @param offset
+   * @return
+   */
+  public Cursor<T> getCursorLastOffset(int offset) {
+    return new Cursor<T>(this, list.size() - 2 + offset, 1);
   }
 
   public Cursor<T> getCursor(long time) {
